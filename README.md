@@ -181,9 +181,9 @@ theme(axis.title.y = element_text(face="italic", vjust=1.5, colour="black", size
 ##Figura Medida de gestión:
 
 ```
-df_stool=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura errores/split_Gestion/Clonal_stool.csv", header = TRUE, sep=";")
-df_distance=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura errores/split_Gestion/Distance.csv", header = TRUE, sep=";")
-df_intra=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura errores/split_Gestion/Intra_clonal.csv", header = TRUE, sep=";")
+df_stool=read.csv("Clonal_stool.csv", header = TRUE, sep=";")
+df_distance=read.csv("split_Gestion/Distance.csv", header = TRUE, sep=";")
+df_intra=read.csv("Intra_clonal.csv", header = TRUE, sep=";")
 
 #stool
 df_stool$ID <- factor(df_stool$ID , levels=c("Observers", "NDVI", "NDRE", "GRVI", "RVI"))
@@ -261,13 +261,13 @@ plot_grid(g1, g2, g3, ncol = 1,
 
 ```
 
-grvi1=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/1.csv", header = TRUE, sep=";")
-grvi2=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/2.csv", header = TRUE, sep=";")
-grvi3=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/3.csv", header = TRUE, sep=";")
-grvi4=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/4.csv", header = TRUE, sep=";")
-grvi5=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/5.csv", header = TRUE, sep=";")
-grvi6=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/6.csv", header = TRUE, sep=";")
-grvi7=read.csv("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/ArcGIS/GRVI_vuelos/csv/7.csv", header = TRUE, sep=";")
+grvi1=read.csv("1.csv", header = TRUE, sep=";")
+grvi2=read.csv("2.csv", header = TRUE, sep=";")
+grvi3=read.csv("3.csv", header = TRUE, sep=";")
+grvi4=read.csv("4.csv", header = TRUE, sep=";")
+grvi5=read.csv("5.csv", header = TRUE, sep=";")
+grvi6=read.csv("6.csv", header = TRUE, sep=";")
+grvi7=read.csv("7.csv", header = TRUE, sep=";")
 
 grvi=rbind(grvi1,grvi2,grvi3,grvi4,grvi5,grvi6)
 grvi$Flight=as.factor(grvi$group)
@@ -292,13 +292,13 @@ histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
   
   ##mapas:
   
-p1_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/1.jpg", scale = 0.9)
-p2_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/2.jpg", scale = 0.9)
-p3_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/3.jpg", scale = 0.9)
-p4_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/4.jpg", scale = 0.9)
-p5_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/5.jpg", scale = 0.9)
-p6_clip <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/grvi_CLIPS/6.jpg", scale = 0.9)
-p7 <- ggdraw() + draw_image("C:/Users/Usuario/Desktop/Jorge/DECAMELO/paper/PAPER/figura2_evolución_índices/Main.jpg", scale = 0.9)
+p1_clip <- ggdraw() + draw_image("grvi_CLIPS/1.jpg", scale = 0.9)
+p2_clip <- ggdraw() + draw_image("grvi_CLIPS/2.jpg", scale = 0.9)
+p3_clip <- ggdraw() + draw_image("grvi_CLIPS/3.jpg", scale = 0.9)
+p4_clip <- ggdraw() + draw_image("grvi_CLIPS/4.jpg", scale = 0.9)
+p5_clip <- ggdraw() + draw_image("grvi_CLIPS/5.jpg", scale = 0.9)
+p6_clip <- ggdraw() + draw_image("grvi_CLIPS/6.jpg", scale = 0.9)
+p7 <- ggdraw() + draw_image("Main.jpg", scale = 0.9)
 
 p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
                    labels=c("1","2","3","4","5","6"),
