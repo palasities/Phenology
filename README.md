@@ -125,7 +125,7 @@ rect.hclust(DENDRO, k=21, border=2:10)
 ```r
 set.seed(12)
 ndvi=read.csv("NDVI.csv", header = TRUE, sep=";")
-ndvi=ndvi[c(1:121),c(1:11)]
+ndvi=ndvi[c(1:121),c(1:10)]
 rownames(ndvi)=ndvi$ID
 
 ndvi=ndvi[,-c(1)]
