@@ -150,7 +150,7 @@ fviz_gap_stat(gap_stat_ndvi)
 ```
 ## Errors figure
 Search de db
-```
+```r
 
 df_errores=read.csv("errores_obs_split.csv", header = TRUE, sep=";")
 rownames(df_errores)=df_errores$ID
@@ -179,7 +179,7 @@ theme(axis.title.y = element_text(face="italic", vjust=1.5, colour="black", size
 
 ## Management tool figure
 
-```
+```r
 df_stool=read.csv("Clonal_stool.csv", header = TRUE, sep=";")
 df_distance=read.csv("split_Gestion/Distance.csv", header = TRUE, sep=";")
 df_intra=read.csv("Intra_clonal.csv", header = TRUE, sep=";")
@@ -258,7 +258,7 @@ plot_grid(g1, g2, g3, ncol = 1,
 
 ## GRVI values time-evolution
 
-```
+```r
 
 grvi1=read.csv("1.csv", header = TRUE, sep=";")
 grvi2=read.csv("2.csv", header = TRUE, sep=";")
@@ -313,7 +313,7 @@ p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
 
   ptodo_clip=plot_grid(p7, p_unidad_clip,
                 rel_widths = c(1,1))
-
+```
 
   #combinado: mapas e histograma
   
