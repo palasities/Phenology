@@ -40,7 +40,6 @@ Next, the dataset "obs1.csv" is loaded. The same code applies to the rest of the
 
 ```r
 df_obs1=read.csv("obs1.csv", header = TRUE, sep=";")
-colnames(df_obs1)=c("ID", "X", "Y", "108", "111", "115", "119", "123", "125", "129", "133", "138", "140", "143")
 
 ```
 We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees (in black).
