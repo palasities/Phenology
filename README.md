@@ -93,7 +93,7 @@ MCA_obs1_coords=data.frame(MCA_obs1$ind$coord)
 
 #define optimal number of clusters
 kmax_obs1=nrow(unique(MCA_obs1_coords))
-gap_stat_obs1 =clusGap(MCA_obs1_coords, FUN = kmeans, nstart = 121, K.max = kmax_obs1 -1, B = 2000) ##it's going to take long time. Decrease B parameter.
+gap_stat_obs1 =clusGap(MCA_obs1_coords, FUN = kmeans, nstart = 121, K.max = kmax_obs1 -1, B = 10) ##it's going to take long time with B=2000.
 
 ## plot number of clusters vs. gap statistic
 fviz_gap_stat(gap_stat_obs1)
@@ -144,8 +144,8 @@ gap_stat_ndvi=clusGap(PCA_ndvi_withcoords,
 FUN = kmeans,
 nstart=121,
 K.max = kmax_NDVI -1,
-B = 10) 
-fviz_gap_stat(gap_stat_ndvi)
+B = 10)  ##it's going to take long time with B=2000.
+fviz_gap_stat(gap_stat_ndvi) 
 
 ```
 ## Errors figure
