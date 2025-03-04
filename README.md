@@ -275,6 +275,7 @@ grvi$Flight=as.factor(grvi$group)
 colores_histo=c("#CD2626","#698B69","#9A32CD","#8B8B00", "#FF7256","#53868B")
 
 ##density lines
+
 histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
   geom_density()+
   theme_bw()+
@@ -287,7 +288,7 @@ histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
   histo_line
   
   
-  ##maps:
+##maps:
   
 p1_clip <- ggdraw() + draw_image("grvi_CLIPS/1.jpg", scale = 0.9)
 p2_clip <- ggdraw() + draw_image("grvi_CLIPS/2.jpg", scale = 0.9)
@@ -313,9 +314,8 @@ p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
 
   ptodo_clip=plot_grid(p7, p_unidad_clip,
                 rel_widths = c(1,1))
-```
 
-  #combinado: mapas e histograma
+  #maps and histograms combined
   
   plot_grid(ptodo_clip, histo_line, ncol = 1)
   
