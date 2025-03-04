@@ -6,7 +6,7 @@ Para información específica del rodal de estudio, el periodo de estudio, la fr
 
 A modo de resumen, se utilizarán varios paquetes de R para el análisis íntegro. Por una parte se analizarán datos categóricos (observadores); y de forma paralela se analizarán datos numéricos (drones). Gran parte de los resultados parciales de este código se procesaron mediante ArcGis (no se incluyen los análisis, pero se describen en el estudio mencionado anteriormente).
 
-#Análisis de datos para los observadores de campo
+# Análisis de datos para los observadores de campo
 
 Primero, se cargan los paquetes necesarios en RStudio:
 
