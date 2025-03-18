@@ -11,7 +11,10 @@ Data Analysis for Field Observers
 
 First, the required R packages are loaded into RStudio:
 
+R version 4.3.0
+
 ```r
+
 # List of Required Packages
 packages <- c(
   "reshape", "tidyverse", "RColorBrewer", "ggplot2", "patchwork", "imager",
@@ -80,16 +83,22 @@ plot(figure1)
 ```
 Cluster analysis:
 
+La información categórica de los observadores es, por sí sola, muy potente para definir con precisión el número óptimo de clústers. 
+En el siguiente código se realiza el análisis MCA (Multiple Corresponding Analysis); se extrae, para cada individuo, la cinco coordenadas numéricas del análisis MCA. Este nuevo dataframe se introduce en la función clusGap para definir el número óptimo de clústers, utilizando la función kmeans. Los argumentos nstart=121, kmax=35, B=2000 hacen que k-means se reinicie 121 veces por cada k hasta 35 clusters, repitiendo el proceso 2000 veces en el método de Brecha Estadística (clusGap), lo que garantiza estabilidad pero con un alto costo computacional. O lo que es más intuitivo, para cada k (número de clusters), el algoritmo k-means se ejecutará 121 veces con diferentes puntos de inicio para evitar malos resultados por una mala inicialización. Este proceso se repite B veces con datos re-muestreados para calcular la Brecha Estadística (clusGap), lo que ayuda a determinar el mejor número de clusters de forma robusta.
+
+Una vez calculado el número óptimo de clústers (k), utilizando la función kmeans, se le da un valor k a cada individuo en base a las coordenadas de los individuos obtenidas por el MCA (no las espaciales). Es decir se establece la relación ID-k. Finalmente, se prepara la base de datos para ArcGis con la información ID, X (spatial), Y (spatial) , k.
+
 ```r
 #Multiple Correspondence Analysis (MCA) for the database containing only phenological observations.
 set.seed(12)
-MCA_obs1=MCA(df_fen_obs1)
+
+MCA_obs1=MCA(df_fen_obs1) ##no X,Y coords
 
 ##explained variance
 MCA_obs1$eig
 
 ##new dataframe
-MCA_obs1_coords=data.frame(MCA_obs1$ind$coord)
+MCA_obs1_coords=data.frame(MCA_obs1$ind$coord) ##no X, Y coords
 
 #define optimal number of clusters
 kmax_obs1=nrow(unique(MCA_obs1_coords))
@@ -105,10 +114,13 @@ k1 = kmeans(MCA_obs1_coords, centers = 21, nstart = nrow(MCA_obs1_coords), iter.
 ##db for ArcGis:
 df_k_obs1=cbind(df_obs1[,c(2,3)], k1$cluster) 
 names(df_k_obs1)=c("X","Y","k")
+rownames(df_k_obs1)=df_obs1$ID
 
 ```
 
 Dendrograma
+
+La variable k se pasa a factor para poder representar los rectángulos en diferentes colores (ligados a cada clúster). Para cada individuo, se introduce la información espacial X,Y y el clúster.  
 
 ```r
 
