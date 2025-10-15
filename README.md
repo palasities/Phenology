@@ -17,7 +17,7 @@ packages <- c(
   "png", "gridExtra", "gtable", "logisticPCA", "dplyr", "ca", "factoextra",
   "FactoMineR", "gridExtra", "dendextend", "NbClust", "pvclust", "flexclust",
   "scrime", "bayesbio", "qvcalc", "stringdist", "vegan", "cluster", "purrr",
-  "clustree", "ggraph", "igraph", "ape", "magrittr", "magick", "cowplot"
+  "clustree", "ggraph", "igraph", "ape", "magrittr", "magick", "cowplot", "sf"
 )
 
 # Install Packages If Not Already Installed
@@ -95,10 +95,10 @@ gap_stat_obs1 =clusGap(MCA_obs1_coords, FUN = kmeans, nstart = 121, K.max = 35, 
 ## plot number of clusters vs. gap statistic
 fviz_gap_stat(gap_stat_obs1)
 
-##kmeans with centers= estimated number of clusters + add spatial coordinates.
+##MCA coords + add spatial coordinates.
 for_ID_K_obs1=cbind(MCA_obs1$ind$coord,df_obs1[,c(2,3)])
 
-##OBS1. id-k
+##OBS1. id-k. kmeans with centers = fviz_gap_stat(gap_stat_obs1)
 ID_K_obs1=kmeans(for_ID_K_obs1,centers=21,iter.max = 121, nstart = 121 )
 
 #df for ArcGIS or custom map (next):
@@ -124,17 +124,16 @@ ggplot() +
   theme(legend.position = "bottom") +
   labs(color = "Cluster k")
 
-
 ```
 
 Dendrograma. Diana function  
 
 ```r
 
-df_k_obs1$k=as.factor(df_k_obs1$k)
-rownames(df_k_obs1)=df_k_obs1$ID
-DENDRO=diana(df_k_obs1[,c(2,3,4)])
-pltree(DENDRO, cex = 0.8, hang = -1, main = "", labels=rownames(DENDRO))
+db_obs1_k$k=as.factor(db_obs1_k$k)
+rownames(db_obs1_k)=df_obs1$ID
+DENDRO=diana(db_obs1_k)
+pltree(DENDRO, cex = 0.8, hang = -1, main = "Dendrogram diana function", labels=rownames(DENDRO))
 rect.hclust(DENDRO, k=21, border=2:10)
 
 ```
@@ -153,18 +152,18 @@ ndvi=ndvi[,-c(1)]
 PCA_ndvi=PCA(ndvi[,-c(1,2)])
 PCA_ndvi_withcoords=cbind(PCA_ndvi$ind$coord, ndvi$X, ndvi$Y)
 
-##explained variance
-PCA_ndvi$eig
-
-##define optimal number of clusters
-kmax_NDVI=nrow(unique(PCA_ndvi_withcoords))
 
 gap_stat_ndvi=clusGap(PCA_ndvi_withcoords,
 FUN = kmeans,
 nstart=121,
-K.max = kmax_NDVI -1,
+K.max = 35,
 B = 10)  ##it's going to take long time with B=2000.
-fviz_gap_stat(gap_stat_ndvi) 
+fviz_gap_stat(gap_stat_ndvi)
+
+##id-k for NDVI
+ID_K_ndvi=kmeans(PCA_ndvi_withcoords,centers=14,iter.max = 121, nstart = 121 )
+
+##same as obs1
 
 ```
 ## Errors figure
