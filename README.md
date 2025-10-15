@@ -40,8 +40,9 @@ Next, the dataset "obs1.csv" is loaded. The same code applies to the rest of the
 df_obs1=read.csv("obs1.csv", header = TRUE, sep=";")
 
 ```
-We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees -
+We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees
 
+### Figure 1. Leaf phenological development
 ```r
 
 #To extract the unique vectors, the dataframe (df) must exclude ID and coordinates
@@ -126,7 +127,7 @@ ggplot() +
 
 ```
 
-### Dendrograma. Diana function  
+### Figure 3. Dendrograma. Diana function  
 
 ```r
 
@@ -166,7 +167,73 @@ ID_K_ndvi=kmeans(PCA_ndvi_withcoords,centers=14,iter.max = 121, nstart = 121 )
 ##same as obs1
 
 ```
-### Errors figure
+
+### Figure 2. GRVI values time-evolution
+
+```r
+
+grvi1=read.csv("1.csv", header = TRUE, sep=";")
+grvi2=read.csv("2.csv", header = TRUE, sep=";")
+grvi3=read.csv("3.csv", header = TRUE, sep=";")
+grvi4=read.csv("4.csv", header = TRUE, sep=";")
+grvi5=read.csv("5.csv", header = TRUE, sep=";")
+grvi6=read.csv("6.csv", header = TRUE, sep=";")
+grvi7=read.csv("7.csv", header = TRUE, sep=";")
+
+grvi=rbind(grvi1,grvi2,grvi3,grvi4,grvi5,grvi6)
+grvi$Flight=as.factor(grvi$group)
+
+
+colores_histo=c("#CD2626","#698B69","#9A32CD","#8B8B00", "#FF7256","#53868B")
+
+##density lines
+
+histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
+  geom_density()+
+  theme_bw()+
+  labs(x = "GRVI", y="Density")+
+  xlim(1,10)+
+  theme(legend.position='top', 
+        legend.direction='horizontal')+
+  guides(color=guide_legend(nrow=1)) #color
+
+  histo_line
+  
+  
+##maps:
+  
+p1_clip <- ggdraw() + draw_image("grvi_CLIPS/1.jpg", scale = 0.9)
+p2_clip <- ggdraw() + draw_image("grvi_CLIPS/2.jpg", scale = 0.9)
+p3_clip <- ggdraw() + draw_image("grvi_CLIPS/3.jpg", scale = 0.9)
+p4_clip <- ggdraw() + draw_image("grvi_CLIPS/4.jpg", scale = 0.9)
+p5_clip <- ggdraw() + draw_image("grvi_CLIPS/5.jpg", scale = 0.9)
+p6_clip <- ggdraw() + draw_image("grvi_CLIPS/6.jpg", scale = 0.9)
+p7 <- ggdraw() + draw_image("Main.jpg", scale = 0.9)
+
+p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
+                   labels=c("1","2","3","4","5","6"),
+                   nrow=2,
+                   ncol=3,
+                   align="hv",
+                   axis="l",
+                   rel_widths = 1,
+                   rel_heights = 1,
+                   scale=c(1,1,1,1,1,1),
+                   label_size = 16,
+                   hjust=-0.5,
+                   vjust=2.5)
+                   #byrow = TRUE)
+
+  ptodo_clip=plot_grid(p7, p_unidad_clip,
+                rel_widths = c(1,1))
+
+  #maps and histograms combined
+  
+  plot_grid(ptodo_clip, histo_line, ncol = 1)
+  
+```
+
+### Figure 5. Errors figure
 
 ```r
 
@@ -196,7 +263,7 @@ labs(x = "Obs", y= "Value(%)")+
 
 ```
 
-## Management tool figure
+## Figure 6. Management tool figure
 
 ```r
 
@@ -273,69 +340,4 @@ plot_grid(g1, g2, g3, ncol = 1,
 plot_grid(g1, g2, g3, ncol = 1,
           vjust=12)
 
-```
-
-## GRVI values time-evolution
-
-```r
-
-grvi1=read.csv("1.csv", header = TRUE, sep=";")
-grvi2=read.csv("2.csv", header = TRUE, sep=";")
-grvi3=read.csv("3.csv", header = TRUE, sep=";")
-grvi4=read.csv("4.csv", header = TRUE, sep=";")
-grvi5=read.csv("5.csv", header = TRUE, sep=";")
-grvi6=read.csv("6.csv", header = TRUE, sep=";")
-grvi7=read.csv("7.csv", header = TRUE, sep=";")
-
-grvi=rbind(grvi1,grvi2,grvi3,grvi4,grvi5,grvi6)
-grvi$Flight=as.factor(grvi$group)
-
-
-colores_histo=c("#CD2626","#698B69","#9A32CD","#8B8B00", "#FF7256","#53868B")
-
-##density lines
-
-histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
-  geom_density()+
-  theme_bw()+
-  labs(x = "GRVI", y="Density")+
-  xlim(1,10)+
-  theme(legend.position='top', 
-        legend.direction='horizontal')+
-  guides(color=guide_legend(nrow=1)) #color
-
-  histo_line
-  
-  
-##maps:
-  
-p1_clip <- ggdraw() + draw_image("grvi_CLIPS/1.jpg", scale = 0.9)
-p2_clip <- ggdraw() + draw_image("grvi_CLIPS/2.jpg", scale = 0.9)
-p3_clip <- ggdraw() + draw_image("grvi_CLIPS/3.jpg", scale = 0.9)
-p4_clip <- ggdraw() + draw_image("grvi_CLIPS/4.jpg", scale = 0.9)
-p5_clip <- ggdraw() + draw_image("grvi_CLIPS/5.jpg", scale = 0.9)
-p6_clip <- ggdraw() + draw_image("grvi_CLIPS/6.jpg", scale = 0.9)
-p7 <- ggdraw() + draw_image("Main.jpg", scale = 0.9)
-
-p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
-                   labels=c("1","2","3","4","5","6"),
-                   nrow=2,
-                   ncol=3,
-                   align="hv",
-                   axis="l",
-                   rel_widths = 1,
-                   rel_heights = 1,
-                   scale=c(1,1,1,1,1,1),
-                   label_size = 16,
-                   hjust=-0.5,
-                   vjust=2.5)
-                   #byrow = TRUE)
-
-  ptodo_clip=plot_grid(p7, p_unidad_clip,
-                rel_widths = c(1,1))
-
-  #maps and histograms combined
-  
-  plot_grid(ptodo_clip, histo_line, ncol = 1)
-  
 ```
