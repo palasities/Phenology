@@ -43,6 +43,7 @@ df_obs1=read.csv("obs1.csv", header = TRUE, sep=";")
 We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees
 
 ### Figure 1. Leaf phenological development
+
 ```r
 
 #To extract the unique vectors, the dataframe (df) must exclude ID and coordinates
@@ -78,7 +79,6 @@ plot(figure1)
 
 ```
 # Cluster analysis:
-
 ### Phenological data. See methods in the article for more details.
 
 ```r
@@ -233,7 +233,7 @@ p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
   
 ```
 
-### Figure 5. Errors figure
+### Figure 5. Errors
 
 ```r
 
@@ -263,7 +263,7 @@ labs(x = "Obs", y= "Value(%)")+
 
 ```
 
-## Figure 6. Management tool figure
+## Figure 6. Management tool
 
 ```r
 
