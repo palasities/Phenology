@@ -76,9 +76,9 @@ figure1=  ggplot(data = linear_fenot_melt, aes(x = variable, y = value))+
 plot(figure1)
 
 ```
-Cluster analysis:
+# Cluster analysis:
 
-## Phenological data. See methods in the article for more details.
+### Phenological data. See methods in the article for more details.
 
 ```r
 #Multiple Correspondence Analysis (MCA) for the database containing only phenological observations.
@@ -126,7 +126,7 @@ ggplot() +
 
 ```
 
-Dendrograma. Diana function  
+### Dendrograma. Diana function  
 
 ```r
 
@@ -138,7 +138,7 @@ rect.hclust(DENDRO, k=21, border=2:10)
 
 ```
 
-## Vegetation indexes data analysis. See methods in the article for more details.
+### Vegetation indexes data analysis. See methods in the article for more details.
 
 ```r
 set.seed(12)
@@ -166,15 +166,15 @@ ID_K_ndvi=kmeans(PCA_ndvi_withcoords,centers=14,iter.max = 121, nstart = 121 )
 ##same as obs1
 
 ```
-## Errors figure
-Search de db
+### Errors figure
+
 ```r
 
 df_errores=read.csv("errores_obs_split.csv", header = TRUE, sep=";")
 rownames(df_errores)=df_errores$ID
 errores_melt=melt(df_errores,id.vars="ID")
 
-#change X-axis order
+#order
 errores_melt$ID <- factor(errores_melt$ID , levels=c("Observer1","Observer2","Observer3", "NDVI", "NDRE", "GRVI", "RVI"))
 
 ##plot
@@ -183,21 +183,23 @@ geom_bar(stat='identity',color="black", alpha=0.6)+
 facet_wrap(~variable,  scales = 'free')+
 theme(axis.text.x =element_text(angle = 90, hjust = 1))+
 theme(axis.text.y =element_text(angle = 90, hjust = 1))+
-scale_fill_grey(start = 0.6, end = 0.05)+
-theme(axis.text.x = element_blank())+
-theme(axis.ticks.x = element_blank())+
+  scale_fill_grey(start = 0.6, end = 0.05)+
+#theme(axis.text.x = element_blank())+
+#theme(axis.ticks.x = element_blank())+
 theme(axis.text =element_text(size=10.5))+
 theme(axis.text = element_text(size=10.5))+
 theme(legend.position = "none")+
 labs(x = "Obs", y= "Value(%)")+
-theme(axis.title.x=element_blank())+ 
-theme(axis.title.y = element_text(face="italic", vjust=1.5, colour="black", size=rel(1.1)))
+  theme(axis.title.x=element_blank())+ ##€sto es lo que quita el eje X
+#theme(axis.title.x = element_text(face="italic", vjust=-0.5, colour="black", size=rel(1.1)))+
+  theme(axis.title.y = element_text(face="italic", vjust=1.5, colour="black", size=rel(1.1)))
 
 ```
 
 ## Management tool figure
 
 ```r
+
 df_stool=read.csv("Clonal_stool.csv", header = TRUE, sep=";")
 df_distance=read.csv("split_Gestion/Distance.csv", header = TRUE, sep=";")
 df_intra=read.csv("Intra_clonal.csv", header = TRUE, sep=";")
@@ -216,7 +218,7 @@ labs(y= "Clonal density \n (clones 0.25 ha)")+
 theme(legend.position = "none")+
 theme(axis.title.x=element_blank())+
  theme(axis.text.x = element_blank())+
-labs(tag = "A")##€sto es lo que quita el eje X
+labs(tag = "A") ##remove X
 
 #distance:
 smooth2=4.92005
@@ -243,7 +245,6 @@ g2
 #intra
 
 smooth3=5.409090909
-
 #intervalo de confianza
 smooth_err3=1.634536992
 
@@ -337,5 +338,4 @@ p_unidad_clip=plot_grid(p1_clip, p2_clip, p3_clip, p4_clip, p5_clip, p6_clip,
   
   plot_grid(ptodo_clip, histo_line, ncol = 1)
   
-
 ```
