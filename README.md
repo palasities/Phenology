@@ -302,7 +302,7 @@ histo_line=ggplot(grvi, aes(GRID_CODE, color=Flight, group=Flight))+
   xlim(1,10)+
   theme(legend.position='top', 
         legend.direction='horizontal')+
-  guides(color=guide_legend(nrow=1)) #clave aquí ponerle color, porque si le pones fill como al de arriba no te lo hace porque entiende que es                                       un área
+  guides(color=guide_legend(nrow=1)) #color
 
   histo_line
   
