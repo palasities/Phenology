@@ -1,4 +1,4 @@
-# Phenological monitoring through high-resolution multispectral imaging data analysis
+# Linking leaf phenology and clonal structure in oak coppices through multispectral imaging
 
 This repository describes the analysis of phenological data collected by field observers, as well as multispectral data processed into vegetation indices (drone flights) to estimate the different phenological strains of a Quercus pyrenaica coppice through clustering analysis.
 
