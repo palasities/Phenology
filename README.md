@@ -2,10 +2,7 @@
 
 This repository describes the analysis of phenological data collected by field observers, as well as multispectral data processed into vegetation indices (drone flights) to estimate the different phenological strains of a Quercus pyrenaica coppice through clustering analysis.
 
-For specific information about the study stand, study period, observer sampling frequency, and the temporal and spatial resolution of the drone flights, please refer to the article "Phenological monitoring through high-resolution multispectral imaging as a management tool to characterize clonal structure in oak coppices" (Forest Management, doi: XXXXX).
-
-Summary of the Analysis
-Several R packages will be used for the comprehensive analysis. Categorical data (field observers) and numerical data (drone imagery) will be analyzed separately but in parallel. A significant portion of the intermediate results obtained from this code was processed using ArcGIS (the analyses themselves are not included but are described in the aforementioned study).
+For specific information about the study please refer to the article "Linking leaf phenology and clonal structure in oak coppices through multispectral imaging" (Forest Management, doi: XXXXX).
 
 Data Analysis for Field Observers
 
@@ -14,7 +11,6 @@ First, the required R packages are loaded into RStudio:
 R version 4.3.0
 
 ```r
-
 # List of Required Packages
 packages <- c(
   "reshape", "tidyverse", "RColorBrewer", "ggplot2", "patchwork", "imager",
@@ -36,7 +32,6 @@ lapply(packages, install_if_missing)
 
 # Load Packages into the R Session
 invisible(lapply(packages, library, character.only = TRUE))
-
 ```
 
 Next, the dataset "obs1.csv" is loaded. The same code applies to the rest of the observers.
@@ -45,7 +40,7 @@ Next, the dataset "obs1.csv" is loaded. The same code applies to the rest of the
 df_obs1=read.csv("obs1.csv", header = TRUE, sep=";")
 
 ```
-We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees (in black).
+We remove the coordinates to calculate the unique vectors, which represent the different phenotypes in the dataframe. Using this information, a ggplot is created to visualize the trends of the phenotypes over the sampling period. Additionally, a smooth layer is added to observe the overall trend of the studied trees -
 
 ```r
 
@@ -83,10 +78,7 @@ plot(figure1)
 ```
 Cluster analysis:
 
-La información categórica de los observadores es, por sí sola, muy potente para definir con precisión el número óptimo de clústers. 
-En el siguiente código se realiza el análisis MCA (Multiple Corresponding Analysis); se extrae, para cada individuo, la cinco coordenadas numéricas del análisis MCA. Este nuevo dataframe se introduce en la función clusGap para definir el número óptimo de clústers, utilizando la función kmeans. Los argumentos nstart=121, kmax=35, B=2000 hacen que k-means se reinicie 121 veces por cada k hasta 35 clusters, repitiendo el proceso 2000 veces en el método de Brecha Estadística (clusGap), lo que garantiza estabilidad pero con un alto costo computacional. O lo que es más intuitivo, para cada k (número de clusters), el algoritmo k-means se ejecutará 121 veces con diferentes puntos de inicio para evitar malos resultados por una mala inicialización. Este proceso se repite B veces con datos re-muestreados para calcular la Brecha Estadística (clusGap), lo que ayuda a determinar el mejor número de clusters de forma robusta.
-
-Una vez calculado el número óptimo de clústers (k), utilizando la función kmeans, se le da un valor k a cada individuo en base a las coordenadas de los individuos obtenidas por el MCA (no las espaciales). Es decir se establece la relación ID-k. Finalmente, se prepara la base de datos para ArcGis con la información ID, X (spatial), Y (spatial) , k.
+## Phenological data. See methods in the article for more details.
 
 ```r
 #Multiple Correspondence Analysis (MCA) for the database containing only phenological observations.
@@ -94,33 +86,48 @@ set.seed(12)
 
 MCA_obs1=MCA(df_fen_obs1) ##no X,Y coords
 
-##explained variance
-MCA_obs1$eig
-
 ##new dataframe
-MCA_obs1_coords=data.frame(MCA_obs1$ind$coord) ##no X, Y coords
+MCA_obs1_coords=data.frame(MCA_obs1$ind$coord) ##no X, Y coords (spatial coords)
 
 #define optimal number of clusters
-kmax_obs1=nrow(unique(MCA_obs1_coords))
-gap_stat_obs1 =clusGap(MCA_obs1_coords, FUN = kmeans, nstart = 121, K.max = kmax_obs1 -1, B = 10) ##it's going to take long time with B=2000.
+gap_stat_obs1 =clusGap(MCA_obs1_coords, FUN = kmeans, nstart = 121, K.max = 35, B = 10) ##it's going to take long time with B=2000.
 
 ## plot number of clusters vs. gap statistic
 fviz_gap_stat(gap_stat_obs1)
 
+##kmeans with centers= estimated number of clusters + add spatial coordinates.
+for_ID_K_obs1=cbind(MCA_obs1$ind$coord,df_obs1[,c(2,3)])
 
-##kmeans with centers= estimated number of clusters
-k1 = kmeans(MCA_obs1_coords, centers = 21, nstart = nrow(MCA_obs1_coords), iter.max = 121)
+##OBS1. id-k
+ID_K_obs1=kmeans(for_ID_K_obs1,centers=21,iter.max = 121, nstart = 121 )
 
-##db for ArcGis:
-df_k_obs1=cbind(df_obs1[,c(2,3)], k1$cluster) 
-names(df_k_obs1)=c("X","Y","k")
-rownames(df_k_obs1)=df_obs1$ID
+#df for ArcGIS or custom map (next):
+db_obs1_k=cbind(obs1[,c(2,3)],ID_K_obs1$cluster)
+names(db_obs1_k)=c("X","Y","k")
+
+##load shapefile:
+shapefile_path <- "clones_parcela.shp"
+aislamiento_cepas=st_read(shapefile_path)
+
+##ID-K map obs1
+### from point to sf object
+puntos_sf_obs1 <- st_as_sf(db_obs1_k, coords = c("X", "Y"), crs = st_crs(aislamiento_cepas))
+
+#Graph
+ggplot() +
+  geom_sf(data = aislamiento_cepas, fill = NA, color = "gray40") + 
+  geom_sf(data = puntos_sf_obs1, aes(color = as.factor(k)), size = 3.5) +  # k como factor categórico
+  geom_text(data = db_obs1_k, aes(x = X, y = Y, label = rownames(db_obs1_k)), 
+            size = 4, color = "black") +
+  scale_color_viridis_d(option = "turbo", begin = 0, end = 1) +       # Paleta llamativa
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(color = "Cluster k")
+
 
 ```
 
-Dendrograma
-
-La variable k se pasa a factor para poder representar los rectángulos en diferentes colores (ligados a cada clúster). Para cada individuo, se introduce la información espacial X,Y y el clúster.  
+Dendrograma. Diana function  
 
 ```r
 
@@ -132,7 +139,7 @@ rect.hclust(DENDRO, k=21, border=2:10)
 
 ```
 
-### Vegetation indexes data analysis
+## Vegetation indexes data analysis. See methods in the article for more details.
 
 ```r
 set.seed(12)
