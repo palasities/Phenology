@@ -129,7 +129,7 @@ ggplot() +
 ```
 ### Alternative methods (observers)
 
-```
+```r
 # Gower distance
 dist_gower_obs1 <- daisy(feno_obs1, metric = "gower")
 
@@ -320,9 +320,9 @@ ID_K_ndvi=kmeans(PCA_ndvi_withcoords,centers=14,iter.max = 121, nstart = 121 )
 
 ```
 
-### Alternative methods (VIs)
+### Alternative methods (vegetation indexes)
 
-```
+```r
 dist_ndvi <- dist(ndvi_autumn_noSeven)
 hc_ndvi <- hclust(dist_ndvi, method = "average") 
 
