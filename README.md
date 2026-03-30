@@ -17,7 +17,8 @@ packages <- c(
   "png", "gridExtra", "gtable", "logisticPCA", "dplyr", "ca", "factoextra",
   "FactoMineR", "gridExtra", "dendextend", "NbClust", "pvclust", "flexclust",
   "scrime", "bayesbio", "qvcalc", "stringdist", "vegan", "cluster", "purrr",
-  "clustree", "ggraph", "igraph", "ape", "magrittr", "magick", "cowplot", "sf"
+  "clustree", "ggraph", "igraph", "ape", "magrittr", "magick", "cowplot", "sf",
+  "fpc"
 )
 
 # Install Packages If Not Already Installed
@@ -126,6 +127,157 @@ ggplot() +
   labs(color = "Cluster k")
 
 ```
+### Alternative methods (observers)
+
+```
+# Gower distance
+dist_gower_obs1 <- daisy(feno_obs1, metric = "gower")
+
+# hclust 
+hc_obs1 <- hclust(dist_gower_obs1, method = "average")
+plot(hc_obs1)
+
+# silhouette hclust
+sil_width_obs1 <- sapply(2:120, function(k){
+  cluster <- cutree(hc_obs1, k)
+  mean(silhouette(cluster, dist_gower_obs1)[, 3])
+})
+
+ks_eval_obs=2:121
+
+# bootstrap hclust
+boot_results_obs1 <- lapply(ks_eval_obs, function(k){    ##boot
+  clusterboot(
+    dist_gower_obs1,
+    B = 250,
+    clustermethod = hclustCBI,
+    method = "average",
+    k = k,
+    distances = TRUE
+  )
+})
+
+BOOT_obs1_silhouette <- sapply(boot_results_obs1, function(x) mean(x$bootmean))
+
+# PAM
+sil_pam_obs1 <- sapply(2:120, function(k){
+  pam(dist_gower_obs1, k = k, diss = TRUE)$silinfo$avg.width
+})
+
+# bootstrap PAM
+boot_results_pam_obs1 <- lapply(ks_eval_obs, function(k){
+  clusterboot(
+    dist_gower_obs1,  ##aquí debería ser pam?
+    B = 250, 
+    clustermethod = claraCBI,
+    k = k,
+    distances = TRUE
+  )
+})
+
+BOOT_obs1_PAM <- sapply(boot_results_pam_obs1, function(x) mean(x$bootmean))
+
+# dataframes
+df_eval_silhouette_obs1 <- data.frame(
+  k = 2:120,
+  silhouette = sil_width_obs1
+)
+
+df_eval_pam_obs1 <- data.frame(
+  k = 2:120,
+  PAM = sil_pam_obs1
+)
+
+df_boot_silhouette_obs1 <- data.frame(
+  k = ks_eval_obs,
+  bootstrap_sil = BOOT_obs1_silhouette
+)
+
+df_boot_PAM_obs1 <- data.frame(
+  k = ks_eval_obs,
+  bootstrap_CLARA_PAM = BOOT_obs1_PAM
+)
+
+# merge 
+df_merge_obs1 <- df_eval_silhouette_obs1 %>%
+  left_join(df_eval_pam_obs1, by = "k") %>%
+  left_join(df_boot_silhouette_obs1, by = "k") %>%
+  left_join(df_boot_PAM_obs1, by = "k")
+
+df_merge_obs1
+
+##TO LONG:
+df_long_obs1 <- df_merge_obs1 %>%
+  pivot_longer(
+    cols = c(silhouette, bootstrap_sil, PAM, bootstrap_CLARA_PAM),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(
+    metric = factor(
+      metric,
+      levels = c("bootstrap_sil", "silhouette","bootstrap_CLARA_PAM", "PAM")
+    )
+  )
+
+###rest of the observers
+
+### plot:
+
+df_long_obs1$observer <- "Observer 1"
+df_long_obs2$observer <- "Observer 2"
+df_long_obs3$observer <- "Observer 3"
+
+## all in the same df
+df_long_all <- rbind(df_long_obs1, df_long_obs2, df_long_obs3)
+
+k_selected <- data.frame(
+  observer = c("Observer 1", "Observer 2", "Observer 3"),
+  k = c(21, 16, 22)  ###main results from clusGap (to visual comparision)
+)
+
+plot_combined_vertical_OBS <- ggplot(df_long_all, aes(x = k, y = value)) +
+  geom_line(linewidth = 0.8, na.rm = TRUE) +
+  geom_point(size = 1.5, na.rm = TRUE) +
+  
+  ## líneas horizontales (thresholds)
+  geom_hline(
+    data = df_hlines_obs1,  ##son los mismos valores para los tres.
+    aes(yintercept = yintercept),
+    linetype = "dotted",
+    color = "grey40"
+  ) +
+  
+  ## visual
+  geom_vline(
+    data = k_selected,
+    aes(xintercept = k),
+    linetype = "dashed",
+    color = "blue"
+  ) +
+  
+  facet_grid(
+    metric ~ observer,  
+    scales = "free_y",
+    labeller = labeller(
+      metric = c(
+        bootstrap = "Bootstrap stability (Jaccard)",
+        silhouette = "Silhouette width"
+      )
+    )
+  ) +
+  
+  theme_classic(base_size = 14) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    panel.spacing = unit(1.2, "lines")
+  ) +
+  
+  labs(
+    x = "Number of clusters (k)",
+    y = NULL
+  )
+```
 
 ### Figure 3. Dendrograma. Diana function  
 
@@ -167,6 +319,175 @@ ID_K_ndvi=kmeans(PCA_ndvi_withcoords,centers=14,iter.max = 121, nstart = 121 )
 ##same as obs1
 
 ```
+
+### Alternative methods (VIs)
+
+```
+dist_ndvi <- dist(ndvi_autumn_noSeven)
+hc_ndvi <- hclust(dist_ndvi, method = "average") 
+
+##silhouette:
+sil_width_ndvi <- sapply(2:120, function(k){
+  cluster <- cutree(hc_ndvi, k)
+  mean(silhouette(cluster, dist_ndvi)[,3])
+})
+
+k_eval_drones= c(2:120) ##define k (Bootstrap)
+
+##boot_sil_NDVI:
+boot_silhouette_ndvi <- lapply(k_eval_drones, function(k){
+  clusterboot(
+    dist_ndvi,
+    B = 500,
+    clustermethod = hclustCBI,
+    method = "average",
+    k = k,
+    distances=TRUE
+  )
+})
+
+BOOT_ndvi_silhouette <- sapply(boot_silhouette_ndvi, function(x) mean(x$bootmean))
+
+##PAM 
+sil_pam_ndvi=sapply(2:120, function(k){
+  pam(dist_ndvi, k = k, diss = TRUE)$silinfo$avg.width
+})
+
+boot_ndvi_PAM <- lapply(k_eval_drones, function(k){
+  clusterboot(
+    dist_ndvi,
+    B = 500,
+    clustermethod = claraCBI,
+    k = k,
+    distances=TRUE
+  )
+})
+
+
+BOOT_ndvi_PAM <- sapply(boot_ndvi_PAM, function(x) mean(x$bootmean))
+
+# dataframes
+df_eval_silhouette_ndvi <- data.frame(
+  k = 2:120,
+  silhouette = sil_width_ndvi
+)
+
+df_eval_pam_ndvi <- data.frame(
+  k = 2:120,
+  PAM = sil_pam_ndvi
+)
+
+df_boot_silhouette_ndvi <- data.frame(
+  k = k_eval_drones,
+  bootstrap_sil = BOOT_ndvi_silhouette
+)
+
+df_boot_PAM_ndvi <- data.frame(
+  k = k_eval_drones,
+  bootstrap_CLARA_PAM = BOOT_ndvi_PAM
+)
+
+# merge correcto
+df_merge_ndvi <- df_eval_silhouette_ndvi %>%
+  left_join(df_eval_pam_ndvi, by = "k") %>%
+  left_join(df_boot_silhouette_ndvi, by = "k") %>%
+  left_join(df_boot_PAM_ndvi, by = "k")
+
+df_merge_ndvi
+
+
+##TO LONG:
+df_long_ndvi <- df_merge_ndvi %>%
+  pivot_longer(
+    cols = c(silhouette, bootstrap_sil, PAM, bootstrap_CLARA_PAM),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(
+    metric = factor(
+      metric,
+      levels = c("bootstrap_sil", "silhouette","bootstrap_CLARA_PAM", "PAM")
+    )
+  )
+
+df_long_ndvi
+
+df_hlines_ndvi <- data.frame(
+  metric = factor(
+    c("bootstrap_sil", "silhouette","bootstrap_CLARA_PAM", "PAM"),
+    levels = c("bootstrap_sil", "silhouette","bootstrap_CLARA_PAM", "PAM")
+  ),
+  yintercept = c(0.70, 0.5, 0.7, 0.50)
+)
+
+### rest of the VIs and PLOT
+
+df_long_ndvi$VI <- "NDVI"
+df_long_ndre$VI <- "NDRE"
+df_long_grvi$VI <- "GRVI"
+df_long_rvi$VI  <- "RVI"
+
+## unir todo
+df_long_all_IV <- rbind(df_long_ndvi, df_long_ndre, df_long_grvi, df_long_rvi)
+
+
+k_selected_VI <- data.frame(
+  VI = c("NDVI", "NDRE", "GRVI", "RVI"),
+  k = c(14, 21, 22, 19))  
+
+k_selected_VI$VI <- factor(
+  k_selected_VI$VI,
+  levels = c("NDVI", "NDRE", "GRVI", "RVI")
+)
+
+df_long_all_IV$VI <- factor(
+  df_long_all_IV$VI,
+  levels = c("NDVI", "NDRE", "GRVI", "RVI")
+)
+
+plot_combined_vi_vertical_PAM <- ggplot(df_long_all_IV, aes(x = k, y = value)) +
+  geom_line(linewidth = 0.8, na.rm = TRUE) +
+  geom_point(size = 1.5, na.rm = TRUE) +
+  
+  ## (thresholds)
+  geom_hline(
+    data = df_hlines_rvi,
+    aes(yintercept = yintercept),
+    linetype = "dotted",
+    color = "grey40"
+  ) +
+  
+  ## k 
+  geom_vline(
+    data = k_selected_VI,
+    aes(xintercept = k),
+    linetype = "dashed",
+    color = "BLUE"
+  ) +
+  
+  facet_grid(
+    metric ~ VI,   
+    scales = "free_y",
+    labeller = labeller(
+      metric = c(
+        bootstrap = "Bootstrap stability (Jaccard)",
+        silhouette = "Silhouette width"
+      )
+    )
+  ) +
+  
+  theme_classic(base_size = 14) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    panel.spacing = unit(1.2, "lines")
+  ) +
+  
+  labs(
+    x = "Number of clusters (k)",
+    y = NULL
+  )
+```
+
 
 ### Figure 2. GRVI values time-evolution
 
